@@ -1,0 +1,22 @@
+{
+  "name": "SpeakSync AI - ISL Gesture Speech App",
+  "short_name": "SpeakSync AI",
+  "description": "Indian Sign Language (ISL) hand gesture detector & automatic speech synthesizer app.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#080c14",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
