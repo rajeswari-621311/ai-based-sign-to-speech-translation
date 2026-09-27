@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en" style="background-color: #030712; color: #f8fafc;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SpeakSync AI - Mobile & Laptop ISL Gesture App</title>
+  <meta name="description" content="SpeakSync AI mobile & laptop app detects hand gestures automatically and converts 21+ Indian Sign Language (ISL) signs into natural speech in English, Telugu, and Hindi.">
+
+  <!-- PWA Manifest & Mobile App Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SpeakSync AI">
+  <link rel="apple-touch-icon" href="logo.jpg">
+
+  <!-- Google Fonts: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- MediaPipe Hands & Camera Utility Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css?v=pwa_mobile_app_v14">
+</head>
+<body style="background-color: #030712; color: #f8fafc;" class="dark-theme font-medium">
+
+  <div class="app-viewport" id="appViewport" style="background-color: #080c14; color: #f8fafc;">
+    
+    <!-- Top Header Bar -->
+    <header class="header" role="banner">
+      <div class="brand-container">
+        <div class="logo-badge" title="SpeakSync AI Logo">
+          <img src="logo.jpg" alt="Hand Sign and Microphone Logo" id="headerLogoImg">
+        </div>
+        <div class="app-title-group">
+          <h1>SpeakSync AI</h1>
+          <span class="tagline">Mobile & Laptop ISL App</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="pill" id="bluetoothStatusPill" title="Audio Device Output">🎧 Speaker</span>
+        <button class="icon-btn-header" id="btnShareHeader" title="Share App Link" aria-label="Share App Link" onclick="shareApplicationLink()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="18" cy="5" r="3"/>
+            <circle cx="6" cy="12" r="3"/>
+            <circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+        </button>
+        <button class="icon-btn-header" onclick="switchScreen('profile')" title="Open Profile" aria-label="Open User Profile">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Dynamic Content Views -->
+    <main class="main-content" id="mainContent" role="main">
+
+      <!-- PWA Install App Prompt Banner -->
+      <button id="btnInstallPwa" class="btn-primary" style="display: none; width: 100%; margin-bottom: 10px; padding: 12px; background: linear-gradient(135deg, #2563eb, #1d4ed8); font-size: 0.9rem; border-radius: 12px; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);">
+        📲 Install SpeakSync AI App on Mobile / Laptop
+      </button>
+
+      <!-- Audio Unlock Prompt Banner -->
+      <button id="btnEnableAudio" class="btn-primary" style="width: 100%; margin-bottom: 12px; padding: 12px; background: linear-gradient(135deg, #16a34a, #15803d); font-size: 0.92rem; border-radius: 12px; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);">
+        🔊 Tap Here to Activate Speaker & Bluetooth Voice Audio
+      </button>
+
+      <!-- 1. HOME SCREEN VIEW -->
+      <section class="screen-view active" id="screen-home" aria-label="Home Screen">
+        
+        <div class="hero-card">
+          <div class="hero-icon-box" aria-hidden="true">
+            🖐️🎙️
+          </div>
+          <div class="hero-text">
+            <h2>SpeakSync AI (ISL Voice)</h2>
+            <p>Automatic Hand Tracking & Speech Synthesizer for Indian Sign Language.</p>
+            <div class="status-pills">
+              <span class="pill active">● Mobile Camera Ready</span>
+              <span class="pill">21 ISL Signs Loaded</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile & Laptop Link Card -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1.5px solid rgba(6, 182, 212, 0.4); border-radius: 18px; padding: 14px; display: flex; align-items: center; gap: 14px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);">
+          <div style="background: white; padding: 6px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=http://10.0.41.192:8000" alt="Scan QR Code to open on Mobile" style="width: 75px; height: 75px; display: block;">
+          </div>
+          <div style="flex: 1;">
+            <span style="font-size: 0.72rem; color: #06b6d4; font-weight: 800; text-transform: uppercase;">📲 Mobile & Laptop App Link</span>
+            <h4 style="font-size: 0.95rem; font-weight: 800; color: #ffffff; margin: 2px 0;">http://10.0.41.192:8000</h4>
+            <p style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px;">Scan QR with phone camera to use mobile camera.</p>
+            <button class="btn-primary" onclick="shareApplicationLink()" style="padding: 6px 12px; font-size: 0.78rem;">
+              🔗 Share Link
+            </button>
+          </div>
+        </div>
+
+        <!-- Four Main Options Grid -->
+        <div class="menu-grid" role="navigation" aria-label="Main Application Features">
+          
+          <button class="menu-card featured" onclick="switchScreen('camera')" id="btnStartCamera" aria-label="Start Camera AI Gesture Detector">
+            <div class="menu-card-icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </div>
+            <div class="menu-card-text">
+              <h3>Start Camera</h3>
+              <p>Auto-detect hands using Mobile or Laptop camera with instant speech.</p>
+            </div>
+          </button>
+
+          <button class="menu-card" onclick="switchScreen('gestures')" id="btnMyGestures" aria-label="View My Gestures Library">
+            <div class="menu-card-icon" aria-hidden="true">
+              🖐️
+            </div>
+            <div class="menu-card-text">
+              <h3>My Gestures (21)</h3>
+              <p>Explore 21 ISL sign phrases & 2D hand diagrams</p>
+            </div>
+          </button>
+
+          <button class="menu-card" onclick="switchScreen('history')" id="btnHistoryHome" aria-label="View Speech History">
+            <div class="menu-card-icon" aria-hidden="true">
+              📜
+            </div>
+            <div class="menu-card-text">
+              <h3>History</h3>
+              <p>Log of spoken phrases & instant repeat</p>
+            </div>
+          </button>
+
+          <button class="menu-card" onclick="switchScreen('profile')" id="btnProfileHome" aria-label="View User Profile">
+            <div class="menu-card-icon" aria-hidden="true">
+              👤
+            </div>
+            <div class="menu-card-text">
+              <h3>Profile</h3>
+              <p>Personal info & Gmail account</p>
+            </div>
+          </button>
+
+          <button class="menu-card" onclick="switchScreen('settings')" id="btnSettings" aria-label="Open App Settings">
+            <div class="menu-card-icon" aria-hidden="true">
+              ⚙️
+            </div>
+            <div class="menu-card-text">
+              <h3>Settings</h3>
+              <p>Default audio, font size & options</p>
+            </div>
+          </button>
+
+        </div>
+
+        <div class="quick-gestures-box">
+          <div class="quick-gestures-header">
+            <h3>⚡ Quick ISL Voice Tester (21 Signs)</h3>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Tap sign to speak</span>
+          </div>
+          <div class="quick-pills-row">
+            <button class="quick-pill-btn" onclick="speakText('Hello! Namaste.', 'en')">🙏 Namaste</button>
+            <button class="quick-pill-btn" onclick="speakText('I need water, please.', 'en')">🥛 Need Water</button>
+            <button class="quick-pill-btn" onclick="speakText('Thank you very much.', 'en')">👍 Thank You</button>
+            <button class="quick-pill-btn" onclick="speakText('Help me! Call a doctor.', 'en')">🏥 Doctor</button>
+            <button class="quick-pill-btn" onclick="speakText('I am hungry.', 'en')">🍱 Hungry</button>
+            <button class="quick-pill-btn" onclick="speakText('Where is the restroom?', 'en')">🚾 Toilet</button>
+            <button class="quick-pill-btn" onclick="speakText('Please call my family on phone.', 'en')">📞 Call Family</button>
+            <button class="quick-pill-btn" onclick="speakText('I love & respect you.', 'en')">🤟 Love</button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 2. CAMERA SCREEN VIEW (WITH MOBILE CAMERA SWITCHER) -->
+      <section class="screen-view" id="screen-camera" aria-label="Camera Screen for Gesture Detection">
+        
+        <div class="camera-container">
+          <video id="cameraFeed" class="camera-feed" autoplay playsinline muted></video>
+          <canvas id="canvasOverlay" class="canvas-overlay"></canvas>
+
+          <div class="camera-message-banner" id="cameraMessage">
+            <span class="pulse-dot"></span> Show gesture for instant voice
+          </div>
+
+          <div class="camera-controls-overlay" style="display: flex; gap: 6px;">
+            <!-- Mobile Front/Back Camera Switcher -->
+            <button class="btn-cam-action" id="btnToggleCameraFacing" title="Switch Front/Back Camera" aria-label="Switch Front or Back Camera" style="width: auto; padding: 0 10px; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 4px;">
+              📷 Flip Cam
+            </button>
+            <button class="btn-cam-action" onclick="startCamera()" title="Refresh Camera" aria-label="Refresh Camera">
+              🔄
+            </button>
+          </div>
+        </div>
+
+        <div class="detection-output-card">
+          <div class="output-header" style="justify-content: flex-end;">
+            <span class="auto-spoken-pill" id="autoSpokenPill" style="display: inline-block;">🔊 AUTO SPOKEN!</span>
+          </div>
+
+          <div class="detected-text-box">
+            <div class="detected-phrase-display" id="detectedPhrase">
+              Hello! Namaste.
+            </div>
+            <div class="detected-subtext" id="detectedSubtext">
+              Sign: Namaste / Hello 🙏
+            </div>
+          </div>
+
+          <div class="speak-action-bar">
+            <button class="btn-speak-large" id="btnSpeak" aria-label="Convert recognized text into natural speech">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M11 5L6 9H2V15H6L11 19V5Z"/>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+              </svg>
+              Speak Text
+            </button>
+
+            <select class="lang-selector-pill" id="cameraLangSelect" aria-label="Select Speech Output Language">
+              <option value="en">🇬🇧 English</option>
+              <option value="te">🇮🇳 Telugu (తెలుగు)</option>
+              <option value="hi">🇮🇳 Hindi (हिन्दी)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="sim-controls-card">
+          <p>🧪 Test ISL Gesture Voice Trigger (21 Signs):</p>
+          <div class="sim-buttons-flex" id="simButtonsFlex"></div>
+        </div>
+
+      </section>
+
+      <!-- 3. MY GESTURES SCREEN VIEW -->
+      <section class="screen-view" id="screen-gestures" aria-label="My Gestures Library Screen">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h2>🖐️ ISL Gestures (21 Signs)</h2>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Visual Posture Guide</span>
+        </div>
+
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+          Explore all 21 Indian Sign Language (ISL) gestures with 2D landmark diagrams and finger guides. Tap to listen to voice output in English, Telugu, or Hindi.
+        </p>
+
+        <div class="gestures-list-container" id="gesturesList"></div>
+      </section>
+
+      <!-- 4. HISTORY SCREEN VIEW -->
+      <section class="screen-view" id="screen-history" aria-label="Speech History Screen">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h2>📜 Speech History</h2>
+          <button class="btn-secondary" id="btnClearHistory" style="padding: 6px 12px; font-size: 0.8rem;">
+            Clear Log
+          </button>
+        </div>
+
+        <div class="history-list" id="historyList"></div>
+      </section>
+
+      <!-- 5. PROFILE SCREEN VIEW -->
+      <section class="screen-view" id="screen-profile" aria-label="User Profile Screen">
+        <h2>👤 User Profile</h2>
+
+        <div class="hero-card" style="align-items: flex-start;">
+          <div class="hero-icon-box" style="width: 54px; height: 54px; font-size: 28px; background: linear-gradient(135deg, #0284c7, #2563eb);">
+            👤
+          </div>
+          <div class="hero-text" style="flex: 1;">
+            <h2 id="profileHeaderName">Sivakasi</h2>
+            <p id="profileHeaderEmail">sivakasi@gmail.com</p>
+            <div class="status-pills" style="margin-top: 6px;">
+              <span class="pill active">● Verified Account</span>
+              <span class="pill" id="profileRoleDisplay">Speech Assistive Communicator</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h3>📝 Edit Profile Information</h3>
+
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div>
+              <label style="font-size: 0.85rem; font-weight: 700; color: #94a3b8; display: block; margin-bottom: 4px;">User Name</label>
+              <input type="text" class="text-field-input" id="profileNameInput" value="Sivakasi" placeholder="Enter your full name">
+            </div>
+
+            <div>
+              <label style="font-size: 0.85rem; font-weight: 700; color: #94a3b8; display: block; margin-bottom: 4px;">Gmail Account</label>
+              <input type="email" class="text-field-input" id="profileEmailInput" value="sivakasi@gmail.com" placeholder="name@gmail.com">
+            </div>
+
+            <div>
+              <label style="font-size: 0.85rem; font-weight: 700; color: #94a3b8; display: block; margin-bottom: 4px;">Emergency Contact Phone</label>
+              <input type="tel" class="text-field-input" id="profilePhoneInput" value="+91 98765 43210" placeholder="Emergency doctor phone">
+            </div>
+
+            <button class="btn-primary" id="btnSaveProfile" style="margin-top: 6px; justify-content: center; width: 100%;">
+              💾 Save Profile Details
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h3>🚨 Emergency SOS Voice</h3>
+          <button class="btn-primary" onclick="speakText('Help me! Call emergency doctor immediately.', appState.currentLanguage)" style="background: linear-gradient(135deg, #dc2626, #991b1b); width: 100%; justify-content: center; font-size: 0.92rem; padding: 12px;">
+            🚨 SPEAK EMERGENCY DOCTOR HELP
+          </button>
+        </div>
+      </section>
+
+      <!-- 6. SETTINGS SCREEN VIEW -->
+      <section class="screen-view" id="screen-settings" aria-label="Settings Screen">
+        <h2>⚙️ App Settings & Mobile Link</h2>
+
+        <div class="settings-group">
+          <h3>🌐 Universal Mobile & Laptop App Link</h3>
+          <p style="font-size: 0.82rem; color: #94a3b8;">
+            Open this URL on laptops, mobile phones, tablets, or smart TVs connected to your local Wi-Fi:
+          </p>
+          <input type="text" class="text-field-input" id="shareUrlInput" readonly value="http://10.0.41.192:8000">
+          <button class="btn-primary" onclick="shareApplicationLink()" style="justify-content: center; width: 100%; font-size: 0.88rem;">
+            📱 Share Link / Copy URL
+          </button>
+        </div>
+
+        <div class="settings-group">
+          <h3>🎧 Default Audio & Output Routing</h3>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label for="audioOutputSelect">Default Audio Output</label>
+              <p>Choose default device (Speakers, Headphones, Bluetooth)</p>
+            </div>
+            <select class="select-input" id="audioOutputSelect">
+              <option value="default">🔊 Default Phone/Computer Speakers</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 8px; margin-top: 6px;">
+            <button class="btn-primary" id="btnSelectBluetooth" style="flex: 1; padding: 10px; font-size: 0.85rem; justify-content: center;">
+              📡 Pair Bluetooth Headset
+            </button>
+            <button class="btn-secondary" id="btnTestBluetooth" style="padding: 10px; font-size: 0.85rem;">
+              🔊 Test Audio
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h3>♿ Font Size & Display Options</h3>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label for="fontSizeSelect">Text Font Size</label>
+              <p>Adjust UI text scale for readability</p>
+            </div>
+            <select class="select-input" id="fontSizeSelect">
+              <option value="small">Small Text (14px)</option>
+              <option value="medium" selected>Medium Standard (16px)</option>
+              <option value="large">Large Text (18px)</option>
+              <option value="xlarge">Extra Large (20px)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h3>🌐 Speech & Voice Options</h3>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label for="settingLangSelect">Primary Voice Language</label>
+              <p>Speech synthesis language</p>
+            </div>
+            <select class="select-input" id="settingLangSelect">
+              <option value="en">English (India/US)</option>
+              <option value="te">Telugu (తెలుగు)</option>
+              <option value="hi">Hindi (हिन्दी)</option>
+            </select>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label for="toggleAutoSpeak">Auto-Speak (Instant Voice)</label>
+              <p>Automatically speak when ISL gesture is detected</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggleAutoSpeak" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label for="speechRateInput">Speech Rate Speed (<span id="speechRateVal">1.0x</span>)</label>
+              <p>Adjust playback speed</p>
+            </div>
+            <input type="range" id="speechRateInput" min="0.5" max="1.5" step="0.1" value="1.0" style="width: 100px;">
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label for="speechPitchInput">Speech Pitch Tone (<span id="speechPitchVal">1.0x</span>)</label>
+              <p>Adjust voice frequency pitch</p>
+            </div>
+            <input type="range" id="speechPitchInput" min="0.5" max="1.5" step="0.1" value="1.0" style="width: 100px;">
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label for="toggleHaptic">Haptic Touch Vibration</label>
+              <p>Vibrate on speech trigger</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggleHaptic" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Bottom Taskbar Navigation -->
+    <nav class="bottom-nav" role="navigation" aria-label="Bottom Taskbar Navigation">
+      
+      <button class="nav-item active" data-screen="home" aria-label="Go to Home screen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span>Home</span>
+      </button>
+
+      <button class="nav-item" data-screen="gestures" aria-label="Go to My Gestures library">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/>
+          <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v6"/>
+          <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/>
+          <path d="M18 8a2 2 0 0 1 2 2v4a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.9-2.2L2 15.5"/>
+        </svg>
+        <span>Gestures</span>
+      </button>
+
+      <button class="nav-item" data-screen="history" aria-label="Go to Speech History log">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span>History</span>
+      </button>
+
+      <button class="nav-item" data-screen="profile" aria-label="Go to User Profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span>Profile</span>
+      </button>
+
+      <button class="nav-item" data-screen="settings" aria-label="Go to Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        <span>Settings</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="isl_gestures.js?v=pwa_mobile_app_v14"></script>
+  <script src="app.js?v=pwa_mobile_app_v14"></script>
+</body>
+</html>
